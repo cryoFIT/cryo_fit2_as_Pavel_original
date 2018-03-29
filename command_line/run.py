@@ -22,14 +22,14 @@ include scope libtbx.phil.interface.tracking_params
 Input{
   model_file_name = None
     .type = path
-    .short_caption = Starting model file (.cif/.pdb)
+    .short_caption = Starting model file 
     .multiple = False
-    .help = map_to_model derived model / homology model / model from different organism/experimental method
+    .help = map_to_model derived model / homology model / model from different organism/experimental method (available format: .cif/.pdb)
     .style = file_type:pdb bold input_file
   map_file_name = None
     .type = path
     .short_caption = Target map file
-    .help = Cryo-EM map file (available format: .ccp4/.map).
+    .help = Cryo-EM map file (available format: .ccp4/.map)
     .style = bold input_file
 }
 Output
@@ -116,26 +116,8 @@ def validate_params(params): # validation for GUI
 # end of validate_params function
 
 def run(args, prefix="tst_00", validated=False):
-  user_provided_pdb = False
-  user_provided_map = False
-  
   user_input_pdb = ''
   user_input_map = ''
-  '''
-  # very simple parsing of model and map
-  for i, arg in enumerate(args):
-    if arg.endswith('.pdb') or arg.endswith('.cif'):
-      user_provided_pdb = True
-      user_input_pdb = arg
-      
-    elif arg.endswith('.ccp4') or arg.endswith('.map') or arg.endswith('.sit'):
-      user_provided_map = True
-      user_input_map = arg
-  
-  argument_interpreter = libtbx.phil.command_line.argument_interpreter(
-    master_phil=master_phil,
-    home_scope="cryo_fit2",
-  )'''
   
   # very simple parsing of model and map
   for i, arg in enumerate(args):
@@ -152,6 +134,8 @@ def run(args, prefix="tst_00", validated=False):
     master_phil=master_phil,
     home_scope="cryo_fit2",
   )
+  
+  user_input_pdb = clean_pdb_for_phenix(user_input_pdb)
   
   pdbs = []
   maps = []
@@ -182,7 +166,6 @@ def run(args, prefix="tst_00", validated=False):
     
   # Compute a target map
   from iotbx import ccp4_map
-  print 'user_input_map:', user_input_map
   ccp4_map = ccp4_map.map_reader(user_input_map)
   print "Map read from %s" %(user_input_map)
   target_map_data = ccp4_map.map_data()
