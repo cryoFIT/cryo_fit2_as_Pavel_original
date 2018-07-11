@@ -114,7 +114,7 @@ def validate_params(params): # validation for GUI
     raise Sorry("Map file should be given")
   # check if file type is OK
   
-  pdb_in = file_reader.any_file(file_name = params.cryo_fit2.Input.model_file_name).check_file_type(expected_type = 'pdb')
+  file_reader.any_file(file_name = params.cryo_fit2.Input.model_file_name).check_file_type(expected_type = 'pdb')
   
   print('validate_params pass')
   return True
