@@ -2,7 +2,13 @@
 # LIBTBX_PRE_DISPATCHER_INCLUDE_SH PHENIX_GUI_ENVIRONMENT=1
 # LIBTBX_PRE_DISPATCHER_INCLUDE_SH export PHENIX_GUI_ENVIRONMENT
 
-from __future__ import division
+
+from __future__ import division, print_function
+try:
+  from phenix.program_template import ProgramTemplate
+except ImportError:
+  from libtbx.program_template import ProgramTemplate
+  
 from iotbx import file_reader
 import iotbx.pdb
 import libtbx
@@ -108,10 +114,9 @@ def validate_params(params): # validation for GUI
     raise Sorry("Map file should be given")
   # check if file type is OK
   
-  file_reader.any_file(
-    file_name = params.cryo_fit2.Input.model_file_name).check_file_type(expected_type = 'pdb')
-
-  print "validate_params pass"
+  pdb_in = file_reader.any_file(file_name = params.cryo_fit2.Input.model_file_name).check_file_type(expected_type = 'pdb')
+  
+  print('validate_params pass')
   return True
 # end of validate_params function
 
@@ -167,7 +172,7 @@ def run(args, prefix="tst_00", validated=False):
   # Compute a target map
   from iotbx import ccp4_map
   ccp4_map = ccp4_map.map_reader(user_input_map)
-  print "Map read from %s" %(user_input_map)
+  print('Map read from %s' %(user_input_map))
   target_map_data = ccp4_map.map_data()
     
   # initial atomic model that we want to fit to an EM-map
@@ -187,8 +192,8 @@ def run(args, prefix="tst_00", validated=False):
   params.number_of_steps = 1000
   params.update_grads_shift = 0.
   params.interleave_minimization=False #Pavel will fix the error that occur when params.interleave_minimization=True
-  #
-  print "CC:", calculate_cc(map_data=target_map_data, model=model, resolution=3.)
+  
+  print('CC: %s' %(calculate_cc(map_data=target_map_data, model=model, resolution=3.)))
   #STOP()
   result = sa.run(
     params = params,
@@ -208,9 +213,9 @@ def run(args, prefix="tst_00", validated=False):
 if (__name__ == "__main__"):
   args = sys.argv[1:]
   if len(args) == 0:
-    print "Please provide user.pdb user.map"
-    print "Example: python dynamics.py user.pdb user.map"
+    print ('Please provide user.pdb user.map')
+    print ('Example: python cryo_fit2 user.pdb user.map')
     exit(1)
   run(args)
-  print "OK"
+  print ('OK')
   
